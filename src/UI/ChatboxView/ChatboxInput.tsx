@@ -1,38 +1,46 @@
-import { useState, useContext, useEffect } from "react"
+import { useState, useContext } from "react"
 import { DocIcon } from "../../components/svg/DocIcon"
 import { SendIcon } from "../../components/svg/SendIcon"
 import { newMessage } from "../../services/Api"
 import { AccountContext } from "../../context/AccountProvider"
 
-export const ChatboxInput = ({ conversationId }) => {
-    const { account, person, setTrigger, trigger, setNewMessage, socket } = useContext(AccountContext)
+interface Message {
+    senderId: string;
+    receiverId: string;
+    conversationId: string;
+    type: string;
+    text: string;
+}
+
+export const ChatboxInput = ({ conversationId, setMessages }) => {
+    const { account, person, setTrigger, trigger, socket } = useContext(AccountContext)
     const [text, setText] = useState("")
 
-    const sendText = async (e: any) => {
+    const sendText = async (e: React.FormEvent) => {
         e.preventDefault()
-        let message = {
+
+        const message: Message = {
             senderId: account.sub,
             receiverId: person.sub,
-            conversationId: conversationId,
+            conversationId: conversationId._id,
             type: "text",
             text: text
         }
 
-        if (text.length === 0) {
+        if (text.trim() === "") {
             console.log("message should be something")
         }
         else {
             try {
                 socket.emit("sendMessage", message)
                 await newMessage(message);
+                setMessages((prev) => [...prev, message])
             } catch (err) {
                 console.log("coldn't send message")
             }
         }
         setText("")
         setTrigger(!trigger)
-        setNewMessage(message)
-
     }
 
     return (

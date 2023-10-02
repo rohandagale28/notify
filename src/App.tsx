@@ -5,7 +5,7 @@ import AccountProvider from './context/AccountProvider'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 
 export const App = () => {
-  const clientId = "372173973000-23ufh2fiel3j0s7414gvlo77ksr8nl11.apps.googleusercontent.com"
+  const clientId = import.meta.env.VITE_OAUTH_URL
 
   return (
     <React.Fragment>

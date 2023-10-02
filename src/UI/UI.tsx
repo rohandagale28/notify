@@ -7,7 +7,7 @@ import { AccountContext } from '../context/AccountProvider'
 export const UI = () => {
     const { socket, account } = useContext(AccountContext)
 
-    const { sub, ...data } = account
+    const { sub } = account
 
     useEffect(() => {
         if (socket) {
@@ -15,7 +15,8 @@ export const UI = () => {
         } else {
             console.log("error")
         }
-    }, [])
+    }, [account])
+
     return (
         <React.Fragment>
             <div className='main-container'>

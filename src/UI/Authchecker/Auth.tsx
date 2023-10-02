@@ -9,7 +9,7 @@ export const Messanger = () => {
     const { account, setAccount } = useContext(AccountContext)
 
     useEffect(() => {
-        const user: any = window.localStorage.getItem("user")
+        const user: string | null = window.localStorage.getItem("user")
 
         if (user) {
             const existingUser = JSON.parse(user)
@@ -18,8 +18,7 @@ export const Messanger = () => {
             }
             Existuser()
         }
-
-    }, [])
+    }, [setAccount])
 
     return (
         <React.Fragment>

@@ -1,6 +1,6 @@
 import React from 'react'
 import { useEffect, useRef } from 'react'
-import { Messsage } from "./Messsage"
+import { Message } from "./Message"
 import { EmptyChatbox } from '../../components/EmptyChatbox/EmptyChatbox'
 
 export const ChatboxField = ({ messages }) => {
@@ -10,24 +10,21 @@ export const ChatboxField = ({ messages }) => {
     console.log(messages)
 
     useEffect(() => {
-        // containerRef.current?.scrollTo({ top: containerRef, block: "end" })
+        containerRef.current?.scrollIntoView({ block: "end", behavior: "smooth" })
     }, [messages])
 
     return (
         <>
             <div className="chatbox-field" ref={containerRef}>
-                {messages.length > 0 ? messages.map((item) => {
-                    return (
+                {messages.length > 0 ? (
+                    messages.map((item) => (
                         <React.Fragment key={item._id}>
-                            <Messsage message={item} />
+                            <Message message={item} />
                         </React.Fragment>
-                    )
-                }
-                ) :
-                    <>
-                        <EmptyChatbox text={"No Messages"} />
-                    </>
-                }
+                    ))
+                ) : (
+                    <EmptyChatbox text={"No Messages"} />
+                )}
             </div>
         </>
     )

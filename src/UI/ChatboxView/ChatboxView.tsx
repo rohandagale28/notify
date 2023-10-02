@@ -8,20 +8,18 @@ import { EmptyChatbox } from '../../components/EmptyChatbox/EmptyChatbox'
 import { createConversation, getMessages } from '../../services/Api'
 
 export const ChatboxView = () => {
-    const { person, account, trigger, socket } = useContext(AccountContext)
+    const { person, account, socket } = useContext(AccountContext)
 
-    const [conversationId, setConversationId] = useState<string | undefined>(undefined);
+    const [conversationId, setConversationId] = useState<object | undefined>({ undefined });
     const [messages, setMessages] = useState<object[]>([])
-    const [incommingMessage, setIncommingMessage] = useState<any>()
-
+    const [incomingMessage, setIncomingMessage] = useState<object | null>(null)
 
     const getConversationMessages = async () => {
         try {
             const conversationIdResponse = await createConversation({ senderId: account.sub, receiverId: person.sub })
-            const conversationId = conversationIdResponse.data._id
-            setConversationId(conversationId)
+            setConversationId(conversationIdResponse)
 
-            const res = await getMessages(conversationId)
+            const res = await getMessages(conversationIdResponse._id)
             setMessages(res)
         } catch (err) {
             console.log(err)
@@ -29,36 +27,36 @@ export const ChatboxView = () => {
     }
 
     useEffect(() => {
-        socket.on("getMessage", (data: object) => {
-            console.log(data, "this data is comming in msg format")
-            setIncommingMessage(data)
-        })
-    }, [])
+        const handleMessage = (data: object) => {
+            setIncomingMessage({ ...data, createdAt: Date.now() });
+        };
+        socket.on("getMessage", handleMessage)
+    }, [socket])
 
     useEffect(() => {
-        console.log(incommingMessage, "this is inccomeing useState")
-        incommingMessage && person.sub === incommingMessage.senderId &&
-            setMessages((prev: any) => [...prev, incommingMessage])
-    }, [incommingMessage])
+        console.log(incomingMessage, "this is inccomeing useState")
+        incomingMessage && (incomingMessage.senderId === person.sub) &&
+            setMessages((prev: any) => [...prev, incomingMessage])
+    }, [incomingMessage, person.sub])
 
     useEffect(() => {
         getConversationMessages()
-    }, [person, conversationId, trigger])
+    }, [person.sub])
 
     return (
         <>
             <div className="chatbox">
-                {Object.keys(person).length ?
+                {Object.keys(person).length ? (
                     <>
                         <ChatboxHeader person={person} />
                         <ChatboxField messages={messages} />
-                        <ChatboxInput conversationId={conversationId} />
+                        <ChatboxInput conversationId={conversationId} setMessages={setMessages} />
                     </>
-                    :
+                ) : (
                     <>
                         <EmptyChatbox text={"start Conversation"} />
                     </>
-                }
+                )}
             </div>
         </>
     )
